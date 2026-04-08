@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>AI බලයෙන් පුවත් | Advanced News</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #f5f7fb;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #475569;
+            --primary: #c40000;
+            --border: #e2e8f0;
+            --card-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            --header-bg: #c40000;
+        }
+        body.dark {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border: #334155;
+            --header-bg: #7f1a1a;
+        }
+        body {
+            font-family: 'Inter', 'Noto Sans Sinhala', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        .top-bar {
+            background: var(--header-bg);
+            color: white;
+            padding: 12px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .top-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo h1 { font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
+        .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .custom-btn {
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            font-size: 0.95rem;
+        }
+        .weather-map-btn { background: #3b82f6; color: white; }
+        .location-btn { background: #10b981; color: white; }
+        .weather-widget {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dark-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        .breaking {
+            background: #000000dd;
+            color: #ffd966;
+            padding: 10px 20px;
+            overflow: hidden;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        .search-section {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: space-between;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 60px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+        }
+        .search-box button {
+            background: var(--primary);
+            border: none;
+            padding: 0 20px;
+            border-radius: 60px;
+            color: white;
+            cursor: pointer;
+        }
+        .categories button {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        .cat-btn.active, .cat-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .slider-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            height: 420px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+        }
+        .slide { position: absolute; width: 100%; height: 100%; display: none; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-caption {
+            position: absolute; bottom: 0; background: linear-gradient(to top, #000000cc, transparent);
+            color: white; width: 100%; padding: 25px; font-size: 1.3rem; font-weight: 600;
+        }
+        .news-grid {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 28px;
+        }
+        .news-card {
+            background: var(--surface);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+        }
+        .news-card:hover { transform: translateY(-5px); }
+        .news-card img { width: 100%; height: 200px; object-fit: cover; }
+        .card-content { padding: 18px; }
+        .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; line-height: 1.4; }
+        .card-meta { font-size: 0.75rem; color: var(--text-secondary); }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: var(--surface);
+            max-width: 750px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 32px;
+            padding: 28px;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 18px;
+            right: 22px;
+            font-size: 32px;
+            cursor: pointer;
+            color: #ef4444;
+        }
+        .modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        footer {
+            background: var(--surface);
+            text-align: center;
+            padding: 24px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+        @media (max-width: 700px) {
+            .slider-container { height: 250px; }
+            .news-grid { grid-template-columns: 1fr; }
+            .controls { gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+<div class="top-bar">
+    <div class="top-container">
+        <div class="logo">
+            <h1><i class="fas fa-robot"></i> AI News Lanka</h1>
+        </div>
+        <div class="controls">
+            <!-- Weather Map Button -->
+            <button id="weatherMapBtn" class="custom-btn weather-map-btn">
+                <i class="fas fa-map-marked-alt"></i> Weather Map
+            </button>
+            
+            <!-- Locations Details Button -->
+            <button id="locationBtn" class="custom-btn location-btn">
+                <i class="fas fa-map-marker-alt"></i> Locations Details
+            </button>
+
+            <div class="weather-widget" id="weatherWidget">
+                <i class="fas fa-cloud-sun"></i> <span id="weatherText">පූරණය...</span>
+            </div>
+            <button class="dark-toggle" id="darkModeToggle"><i class="fas fa-moon"></i> අඳුරු</button>
+        </div>
+    </div>
+</div>
+
+<div class="breaking" id="breakingTicker">
+    <span><i class="fas fa-bolt"></i> BREAKING:</span>
+    <marquee id="breakingMarquee"></marquee>
+</div>
+
+<div class="search-section">
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="🔍 පුවත් සොයන්න...">
+        <button id="searchBtn"><i class="fas fa-search"></i></button>
+    </div>
+    <div class="categories">
+        <button class="cat-btn active" data-cat="all">සියල්ල</button>
+        <button class="cat-btn" data-cat="world">ලෝකය</button>
+        <button class="cat-btn" data-cat="technology">තාක්ෂණය</button>
+        <button class="cat-btn" data-cat="sports">ක්‍රීඩා</button>
+        <button class="cat-btn" data-cat="business">ව්‍යාපාර</button>
+    </div>
+</div>
+
+<div class="slider-container" id="sliderContainer"></div>
+<div class="news-grid" id="newsGrid"></div>
+
+<footer>
+    <i class="fas fa-newspaper"></i> සැබෑ කාලීන පුවත්
+</footer>
+
+<div id="newsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeModalBtn">&times;</span>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<script>
+    let allArticles = [];
+    let filteredArticles = [];
+    let currentCategory = 'all';
+    let searchTerm = '';
+
+    // Weather
+    async function fetchWeather() {
+        try {
+            const res = await fetch('https://api.openweathermap.org/data/2.5/weather?q=Colombo&units=metric&appid=a711d55b1e89708be65819eb07c0eeba');
+            const data = await res.json();
+            const temp = Math.round(data.main.temp);
+            document.getElementById('weatherText').innerHTML = `කොළඹ ${temp}°C ${data.weather[0].description}`;
+        } catch(e) { 
+            document.getElementById('weatherText').innerHTML = 'කොළඹ 29°C ☀️'; 
+        }
+    }
+    fetchWeather();
+    setInterval(fetchWeather, 30*60000);
+
+    // Dark Mode
+    const darkToggle = document.getElementById('darkModeToggle');
+    if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+    darkToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // Weather Map Button
+    document.getElementById('weatherMapBtn').addEventListener('click', () => {
+        window.open('https://your-weather-map-link.com', '_blank');   // ← මෙතන Weather Map ලින්ක් එක දාන්න
+    });
+
+    // Locations Details Button
+    document.getElementById('locationBtn').addEventListener('click', () => {
+        window.open('https://your-locations-details-link.com', '_blank');   // ← මෙතන Locations Details ලින්ක් එක දාන්න
+    });
+
+    // RSS Fetch (ඉතිරි කේතය)
+    const RSS_URL = 'https://api.rss2json.com/v1/api.json?rss_url=https://www.lankacnews.com/feeds/posts/default?alt=rss';
+    
+    async function fetchNews() {
+        try {
+            const response = await fetch(RSS_URL);
+            const data = await response.json();
+            allArticles = data.items.map(item => ({
+                title: item.title,
+                link: item.link,
+                description: item.description ? item.description.replace(/<[^>]*>/g, '') : '',
+                thumbnail: item.thumbnail || 'https://via.placeholder.com/800x400?text=News',
+                pubDate: item.pubDate,
+                category: detectCategory(item.title + ' ' + (item.description || ''))
+            }));
+            filteredArticles = [...allArticles];
+            renderSlider();
+            renderNewsGrid();
+            renderBreakingTicker();
+        } catch(err) {
+            console.error(err);
+            document.getElementById('newsGrid').innerHTML = '<div style="text-align:center; padding:40px;">පුවත් ලබාගැනීම අසාර්ථකයි.</div>';
+        }
+    }
+
+    function detectCategory(text) {
+        const lower = text.toLowerCase();
+        if(lower.includes('ටෙක්') || lower.includes('තාක්ෂණ')) return 'technology';
+        if(lower.includes('ක්‍රීඩා') || lower.includes('තරග')) return 'sports';
+        if(lower.includes('ව්‍යාපාර') || lower.includes('ආර්ථික')) return 'business';
+        if(lower.includes('ලෝක') || lower.includes('විදෙස්')) return 'world';
+        return 'general';
+    }
+
+    function renderSlider() {
+        const top5 = allArticles.slice(0,5);
+        let html = '';
+        top5.forEach((item, idx) => {
+            let img = item.thumbnail.replace('s72', 's1200');
+            html += `<div class="slide" style="display:${idx===0?'block':'none'}">
+                        <img src="${img}" alt="slide">
+                        <div class="slide-caption">${item.title}</div>
+                    </div>`;
+        });
+        document.getElementById('sliderContainer').innerHTML = html;
+        startSlider();
+    }
+
+    function startSlider() {
+        let slides = document.querySelectorAll('.slide');
+        let idx = 0;
+        setInterval(() => {
+            slides[idx].style.display = 'none';
+            idx = (idx+1) % slides.length;
+            slides[idx].style.display = 'block';
+        }, 5000);
+    }
+
+    function renderBreakingTicker() {
+        let ticker = allArticles.slice(0,10).map(a => a.title).join(' • ');
+        document.getElementById('breakingMarquee').innerHTML = ticker;
+    }
+
+    async function renderNewsGrid() {
+        let articlesToShow = filteredArticles;
+        if(currentCategory !== 'all') articlesToShow = filteredArticles.filter(a => a.category === currentCategory);
+        if(searchTerm) {
+            articlesToShow = articlesToShow.filter(a => 
+                a.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                a.description.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        const grid = document.getElementById('newsGrid');
+        grid.innerHTML = '';
+
+        for(let article of articlesToShow) {
+            const card = document.createElement('div');
+            card.className = 'news-card';
+            const imgUrl = article.thumbnail.replace('s72', 's600');
+            const date = new Date(article.pubDate).toLocaleDateString('si-LK');
+
+            card.innerHTML = `
+                <img src="${imgUrl}" loading="lazy">
+                <div class="card-content">
+                    <div class="card-title">${article.title}</div>
+                    <div class="card-meta">
+                        <span><i class="far fa-calendar"></i> ${date}</span>
+                    </div>
+                    <div class="summary-preview" style="margin-top:12px; color:#64748b; font-size:0.85rem;">
+                        ${article.description.substring(0, 150)}...
+                    </div>
+                </div>
+            `;
+            card.addEventListener('click', () => openModal(article));
+            grid.appendChild(card);
+        }
+    }
+
+    function openModal(article) {
+        const modal = document.getElementById('newsModal');
+        const modalBody = document.getElementById('modalBody');
+        
+        modalBody.innerHTML = `
+            <h2 style="color:var(--primary); margin-bottom:15px;">${article.title}</h2>
+            <img src="${article.thumbnail.replace('s72','s800')}" style="width:100%; border-radius:20px; margin:15px 0;" onerror="this.src='https://via.placeholder.com/800x400'">
+            <p><strong>විස්තරය:</strong><br>${article.description}</p>
+            
+            <div class="modal-buttons">
+                <a href="${article.link}" target="_blank" style="background:var(--primary); color:white; padding:12px 24px; border-radius:40px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="fas fa-external-link-alt"></i> මුල් පුවත කියවන්න
+                </a>
+            </div>
+        `;
+        modal.style.display = 'flex';
+    }
+
+    // Filters
+    function applyFilters() { renderNewsGrid(); }
+
+    document.getElementById('searchBtn').addEventListener('click', () => {
+        searchTerm = document.getElementById('searchInput').value;
+        applyFilters();
+    });
+
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+        if(e.key === 'Enter') {
+            searchTerm = e.target.value;
+            applyFilters();
+        }
+    });
+
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentCategory = btn.getAttribute('data-cat');
+            applyFilters();
+        });
+    });
+
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+        document.getElementById('newsModal').style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+        if(e.target === document.getElementById('newsModal')) document.getElementById('newsModal').style.display = 'none';
+    });
+
+    // Initialize
+    fetchNews();
+</script>
+</body>
+</html>
