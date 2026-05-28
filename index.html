@@ -3,7 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>AI බලයෙන් පුවත් | Advanced News</title>
+    
+    <!-- A. Base Meta Tags (SEO & Open Graph) -->
+    <title>AI News Lanka | AI බලයෙන් පුවත්</title>
+    <meta name="description" content="AI තාක්ෂණයෙන් සිංහල පුවත් සාරාංශ, ක්‍රීඩා, තාක්ෂණය, ව්‍යාපාරික පුවත් එකම තැනකින්.">
+    <link rel="canonical" href="https://yourdomain.com/">
+
+    <!-- Open Graph (Facebook, LinkedIn) -->
+    <meta property="og:title" content="AI News Lanka">
+    <meta property="og:description" content="සැබෑ කාලීන සිංහල පුවත් සාරාංශ.">
+    <meta property="og:image" content="https://yourdomain.com/logo.png">
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AI News Lanka">
+    <meta name="twitter:description" content="AI බලයෙන් පුවත්.">
+    <meta name="twitter:image" content="https://yourdomain.com/logo.png">
+
+    <!-- B. Structured Data (JSON-LD) for Organization (base) -->
+    <script type="application/ld+json" id="base-ld">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "AI News Lanka",
+        "url": "https://yourdomain.com/",
+        "logo": "https://yourdomain.com/logo.png"
+    }
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -215,16 +242,12 @@
             <h1><i class="fas fa-robot"></i> AI News Lanka</h1>
         </div>
         <div class="controls">
-            <!-- Weather Map Button -->
             <button id="weatherMapBtn" class="custom-btn weather-map-btn">
                 <i class="fas fa-map-marked-alt"></i> Weather Map
             </button>
-            
-            <!-- Locations Details Button -->
             <button id="locationBtn" class="custom-btn location-btn">
                 <i class="fas fa-map-marker-alt"></i> Locations Details
             </button>
-
             <div class="weather-widget" id="weatherWidget">
                 <i class="fas fa-cloud-sun"></i> <span id="weatherText">පූරණය...</span>
             </div>
@@ -272,7 +295,18 @@
     let currentCategory = 'all';
     let searchTerm = '';
 
-    // Weather
+    // --- Default Meta Values (used for reset) ---
+    const DEFAULT_TITLE = 'AI News Lanka | AI බලයෙන් පුවත්';
+    const DEFAULT_DESCRIPTION = 'AI තාක්ෂණයෙන් සිංහල පුවත් සාරාංශ, ක්‍රීඩා, තාක්ෂණය, ව්‍යාපාරික පුවත් එකම තැනකින්.';
+    const DEFAULT_OG_TITLE = 'AI News Lanka';
+    const DEFAULT_OG_DESC = 'සැබෑ කාලීන සිංහල පුවත් සාරාංශ.';
+    const DEFAULT_OG_IMAGE = 'https://yourdomain.com/logo.png';
+    const DEFAULT_OG_URL = 'https://yourdomain.com/';
+    const DEFAULT_TWITTER_TITLE = 'AI News Lanka';
+    const DEFAULT_TWITTER_DESC = 'AI බලයෙන් පුවත්.';
+    const DEFAULT_TWITTER_IMAGE = 'https://yourdomain.com/logo.png';
+
+    // --- Weather ---
     async function fetchWeather() {
         try {
             const res = await fetch('https://api.openweathermap.org/data/2.5/weather?q=Colombo&units=metric&appid=a711d55b1e89708be65819eb07c0eeba');
@@ -286,7 +320,7 @@
     fetchWeather();
     setInterval(fetchWeather, 30*60000);
 
-    // Dark Mode
+    // --- Dark Mode ---
     const darkToggle = document.getElementById('darkModeToggle');
     if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
     darkToggle.addEventListener('click', () => {
@@ -294,17 +328,17 @@
         localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
     });
 
-    // Weather Map Button
+    // --- Weather Map Button ---
     document.getElementById('weatherMapBtn').addEventListener('click', () => {
         window.open('https://your-weather-map-link.com', '_blank');   // ← මෙතන Weather Map ලින්ක් එක දාන්න
     });
 
-    // Locations Details Button
+    // --- Locations Details Button ---
     document.getElementById('locationBtn').addEventListener('click', () => {
         window.open('https://your-locations-details-link.com', '_blank');   // ← මෙතන Locations Details ලින්ක් එක දාන්න
     });
 
-    // RSS Fetch (ඉතිරි කේතය)
+    // --- RSS Fetch ---
     const RSS_URL = 'https://api.rss2json.com/v1/api.json?rss_url=https://www.lankacnews.com/feeds/posts/default?alt=rss';
     
     async function fetchNews() {
@@ -324,7 +358,7 @@
             renderNewsGrid();
             renderBreakingTicker();
             
-            // ★★★ Hash එකක් තියෙනවද බලා article open කරන්න
+            // Hash එකක් තියෙනවද බලා article open කරන්න
             handleHash();
         } catch(err) {
             console.error(err);
@@ -359,6 +393,7 @@
         let slides = document.querySelectorAll('.slide');
         let idx = 0;
         setInterval(() => {
+            if (slides.length === 0) return;
             slides[idx].style.display = 'none';
             idx = (idx+1) % slides.length;
             slides[idx].style.display = 'block';
@@ -401,7 +436,7 @@
                     </div>
                 </div>
             `;
-            // ★★★ Card click කළාම URL hash එක update කර modal open කරන්න
+            // Card click => update hash & open modal with meta tags
             card.addEventListener('click', () => {
                 window.location.hash = 'article=' + encodeURIComponent(article.link);
                 openModal(article);
@@ -410,7 +445,7 @@
         }
     }
 
-    // ★★★ Hash එකෙන් article එක open කරන function එක
+    // --- Hash Handling ---
     function handleHash() {
         const hash = window.location.hash.substring(1);
         if (hash.startsWith('article=')) {
@@ -420,12 +455,78 @@
             if (article) {
                 openModal(article);
             }
+        } else {
+            // No article hash, ensure default meta tags
+            resetMetaTags();
         }
     }
 
-    // ★★★ Browser back/forward හෝ hash වෙනස් වුණොත් අදාළ article open කරන්න
     window.addEventListener('hashchange', handleHash);
 
+    // --- Reset Meta Tags to default ---
+    function resetMetaTags() {
+        document.title = DEFAULT_TITLE;
+        setMeta('description', DEFAULT_DESCRIPTION);
+        setMeta('og:title', DEFAULT_OG_TITLE);
+        setMeta('og:description', DEFAULT_OG_DESC);
+        setMeta('og:image', DEFAULT_OG_IMAGE);
+        setMeta('og:url', DEFAULT_OG_URL);
+        setMeta('twitter:title', DEFAULT_TWITTER_TITLE);
+        setMeta('twitter:description', DEFAULT_TWITTER_DESC);
+        setMeta('twitter:image', DEFAULT_TWITTER_IMAGE);
+        removeArticleStructuredData();
+    }
+
+    function setMeta(property, content) {
+        let selector;
+        if (property.startsWith('og:')) {
+            selector = `meta[property="${property}"]`;
+        } else if (property.startsWith('twitter:')) {
+            selector = `meta[name="${property}"]`;
+        } else {
+            selector = `meta[name="${property}"]`;
+        }
+        const element = document.querySelector(selector);
+        if (element) element.setAttribute('content', content);
+    }
+
+    // --- Article Structured Data (JSON-LD) ---
+    function addArticleStructuredData(article) {
+        removeArticleStructuredData(); // remove any previous article ld+json
+        const ldJson = {
+            "@context": "https://schema.org",
+            "@type": "NewsArticle",
+            "headline": article.title,
+            "description": article.description,
+            "image": article.thumbnail.replace('s72','s800'),
+            "datePublished": article.pubDate,
+            "url": window.location.href,
+            "author": {
+                "@type": "Organization",
+                "name": "AI News Lanka"
+            },
+            "publisher": {
+                "@type": "Organization",
+                "name": "AI News Lanka",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://yourdomain.com/logo.png"
+                }
+            }
+        };
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.id = 'article-ld';
+        script.textContent = JSON.stringify(ldJson);
+        document.head.appendChild(script);
+    }
+
+    function removeArticleStructuredData() {
+        const existing = document.getElementById('article-ld');
+        if (existing) existing.remove();
+    }
+
+    // --- Open Modal with full SEO update ---
     function openModal(article) {
         const modal = document.getElementById('newsModal');
         const modalBody = document.getElementById('modalBody');
@@ -442,9 +543,23 @@
             </div>
         `;
         modal.style.display = 'flex';
+
+        // --- Update Meta Tags ---
+        document.title = article.title + ' | AI News Lanka';
+        setMeta('description', article.description.substring(0, 160));
+        setMeta('og:title', article.title);
+        setMeta('og:description', article.description.substring(0, 200));
+        setMeta('og:image', article.thumbnail.replace('s72','s800'));
+        setMeta('og:url', window.location.href);
+        setMeta('twitter:title', article.title);
+        setMeta('twitter:description', article.description.substring(0, 200));
+        setMeta('twitter:image', article.thumbnail.replace('s72','s800'));
+
+        // --- Add Structured Data ---
+        addArticleStructuredData(article);
     }
 
-    // Filters
+    // --- Filters ---
     function applyFilters() { renderNewsGrid(); }
 
     document.getElementById('searchBtn').addEventListener('click', () => {
@@ -468,16 +583,18 @@
         });
     });
 
-    // ★★★ Modal close කළාම hash එක ඉවත් කරන්න (optional, clean URL)
-    document.getElementById('closeModalBtn').addEventListener('click', () => {
+    // --- Modal Close Handlers (also reset meta tags) ---
+    function closeModalAndReset() {
         document.getElementById('newsModal').style.display = 'none';
-        window.location.hash = '';
-    });
+        window.location.hash = ''; // clear hash
+        resetMetaTags();
+    }
+
+    document.getElementById('closeModalBtn').addEventListener('click', closeModalAndReset);
 
     window.addEventListener('click', (e) => {
         if(e.target === document.getElementById('newsModal')) {
-            document.getElementById('newsModal').style.display = 'none';
-            window.location.hash = '';
+            closeModalAndReset();
         }
     });
 
