@@ -37,11 +37,11 @@
       window.OneSignal = window.OneSignal || [];
       OneSignal.push(function() {
         OneSignal.init({
-          appId: "63ea2789-c247-4b14-abf3-93d389d11737",  // ← ඔබේ OneSignal App ID යොදන්න
+          appId: "63ea2789-c247-4b14-abf3-93d389d11737",  // ← ඔබේ OneSignal App ID
           notifyButton: {
-            enable: false  // අපි custom bell button එකක් දාන නිසා default button off කරමු
+            enable: false
           },
-          allowLocalhostAsSecureOrigin: true, // පරීක්ෂණ සඳහා පමණි
+          allowLocalhostAsSecureOrigin: true,
           promptOptions: {
             slidedown: {
               prompts: [
@@ -121,7 +121,7 @@
         }
         .weather-map-btn { background: #3b82f6; color: white; }
         .location-btn { background: #10b981; color: white; }
-        .notification-btn { background: #ff9800; color: white; } /* නව බොත්තම */
+        .notification-btn { background: #ff9800; color: white; }
         .weather-widget {
             background: rgba(255,255,255,0.2);
             padding: 6px 14px;
@@ -319,7 +319,6 @@
             <button id="locationBtn" class="custom-btn location-btn">
                 <i class="fas fa-map-marker-alt"></i> Locations Details
             </button>
-            <!-- 🔔 නව දැනුම්දීම් බොත්තම -->
             <button id="notificationBtn" class="custom-btn notification-btn">
                 <i class="fas fa-bell"></i> දැනුම්දීම්
             </button>
@@ -365,13 +364,9 @@
 </div>
 
 <script>
-    // ==================== වින්‍යාස ====================
-    // ඔබේ AI API යතුර (විකල්ප)
-    const AI_API_KEY = 'AIzaSyAWQ1KLe5ZXfQ9MjerPG4e2uMASVxQ7TNg'; // ← ඔබේ Google Gemini API key ඇත්නම් යොදන්න
-    // RSS සංග්‍රහ (එකතු කරන්න)
+    // RSS සංග්‍රහ
     const RSS_FEEDS = [
         'https://api.rss2json.com/v1/api.json?rss_url=https://www.lankacnews.com/feeds/posts/default?alt=rss',
-        // 'https://api.rss2json.com/v1/api.json?rss_url=https://www.adaderana.lk/rss.php', // Ada Derana
         // වෙනත් feeds...
     ];
 
@@ -396,7 +391,7 @@
         if (window.OneSignal) {
             OneSignal.push(() => {
                 OneSignal.registerForPushNotifications();
-                OneSignal.showNativePrompt(); // පරිශීලකයාට අවසර ඉල්ලීම
+                OneSignal.showNativePrompt();
             });
         } else {
             alert('OneSignal තවමත් පූරණය වී නැත. කරුණාකර මදක් රැඳී සිටින්න.');
@@ -445,7 +440,6 @@
                 }
             } catch(e) { console.warn('Feed fetch failed:', feedUrl); }
         }
-        // අනුපිටපත් ඉවත් කරන්න (link අනුව)
         const uniqueMap = new Map();
         allItems.forEach(item => {
             if (!uniqueMap.has(item.link)) uniqueMap.set(item.link, item);
@@ -464,7 +458,6 @@
                 pubDate: item.pubDate,
                 category: detectCategory(item.title + ' ' + (item.description || ''))
             }));
-            // දිනය අනුව පෙළගස්වන්න
             allArticles.sort((a,b) => new Date(b.pubDate) - new Date(a.pubDate));
             filteredArticles = [...allArticles];
             renderSlider();
@@ -628,28 +621,20 @@
         if (existing) existing.remove();
     }
 
-    // ==================== AI සාරාංශය (Gemini API) ====================
+    // ==================== AI සාරාංශය (Pollinations.ai - සම්පූර්ණයෙන්ම නොමිලේ) ====================
     async function getAISummary(text, callback) {
-        if (!AI_API_KEY) {
-            callback('⚠️ AI යතුරක් නොමැත. කරුණාකර කේතයට API key ඇතුල් කරන්න.');
-            return;
-        }
-        // Google Gemini API endpoint
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${AI_API_KEY}`;
-        const body = {
-            contents: [{
-                parts: [{ text: `කෙටියෙන් සිංහලෙන් සාරාංශ කරන්න: ${text}` }]
-            }]
-        };
+        // පුවත් විස්තරයෙන් පළමු අක්ෂර 800ක් පමණක් ගන්න
+        const shortText = text.substring(0, 800);
+        const prompt = `කෙටියෙන් සිංහලෙන් සාරාංශ කරන්න: ${shortText}`;
+        const url = 'https://text.pollinations.ai/' + encodeURIComponent(prompt);
         try {
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-            const data = await res.json();
-            const summary = data.candidates[0].content.parts[0].text;
-            callback(summary);
+            const response = await fetch(url);
+            if (!response.ok) {
+                callback('AI සේවාව තාවකාලිකව ලබාගත නොහැක.');
+                return;
+            }
+            const summary = await response.text();
+            callback(summary.trim());
         } catch(e) {
             callback('AI සාරාංශය ලබාගැනීමට අපොහොසත් විය.');
         }
@@ -660,8 +645,7 @@
         const modal = document.getElementById('newsModal');
         const modalBody = document.getElementById('modalBody');
 
-        // Share URL හා Title
-        const shareUrl = article.link; // හෝ window.location.href වුවත් කමක් නැත
+        const shareUrl = article.link;
         const shareTitle = article.title;
         const encodedUrl = encodeURIComponent(shareUrl);
         const encodedTitle = encodeURIComponent(shareTitle);
