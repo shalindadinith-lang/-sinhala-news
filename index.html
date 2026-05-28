@@ -323,6 +323,9 @@
             renderSlider();
             renderNewsGrid();
             renderBreakingTicker();
+            
+            // ★★★ Hash එකක් තියෙනවද බලා article open කරන්න
+            handleHash();
         } catch(err) {
             console.error(err);
             document.getElementById('newsGrid').innerHTML = '<div style="text-align:center; padding:40px;">පුවත් ලබාගැනීම අසාර්ථකයි.</div>';
@@ -398,10 +401,30 @@
                     </div>
                 </div>
             `;
-            card.addEventListener('click', () => openModal(article));
+            // ★★★ Card click කළාම URL hash එක update කර modal open කරන්න
+            card.addEventListener('click', () => {
+                window.location.hash = 'article=' + encodeURIComponent(article.link);
+                openModal(article);
+            });
             grid.appendChild(card);
         }
     }
+
+    // ★★★ Hash එකෙන් article එක open කරන function එක
+    function handleHash() {
+        const hash = window.location.hash.substring(1);
+        if (hash.startsWith('article=')) {
+            const encodedUrl = hash.substring('article='.length);
+            const link = decodeURIComponent(encodedUrl);
+            const article = allArticles.find(a => a.link === link);
+            if (article) {
+                openModal(article);
+            }
+        }
+    }
+
+    // ★★★ Browser back/forward හෝ hash වෙනස් වුණොත් අදාළ article open කරන්න
+    window.addEventListener('hashchange', handleHash);
 
     function openModal(article) {
         const modal = document.getElementById('newsModal');
@@ -445,12 +468,17 @@
         });
     });
 
+    // ★★★ Modal close කළාම hash එක ඉවත් කරන්න (optional, clean URL)
     document.getElementById('closeModalBtn').addEventListener('click', () => {
         document.getElementById('newsModal').style.display = 'none';
+        window.location.hash = '';
     });
 
     window.addEventListener('click', (e) => {
-        if(e.target === document.getElementById('newsModal')) document.getElementById('newsModal').style.display = 'none';
+        if(e.target === document.getElementById('newsModal')) {
+            document.getElementById('newsModal').style.display = 'none';
+            window.location.hash = '';
+        }
     });
 
     // Initialize
